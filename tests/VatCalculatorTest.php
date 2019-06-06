@@ -484,15 +484,15 @@ class VatCalculatorTest extends PHPUnit
 
     public function testCanResolveIPToCountry()
     {
-        self::$file_get_contents_result = '1;DE;DEU;Deutschland';
+        self::$file_get_contents_result = '{"countryCode":"US","countryCode3":"USA","countryName":"United States","countryEmoji":"🇺🇸"}';
         $vatCalculator = new VatCalculator();
         $country = $vatCalculator->getIPBasedCountry();
-        $this->assertEquals('DE', $country);
+        $this->assertEquals('US', $country);
     }
 
     public function testCanResolveInvalidIPToCountry()
     {
-        self::$file_get_contents_result = '0';
+        self::$file_get_contents_result = false;
         $vatCalculator = new VatCalculator();
         $country = $vatCalculator->getIPBasedCountry();
         $this->assertFalse($country);

@@ -17,7 +17,7 @@ class VatCalculator
     /**
      * We're using the free ip2c service to lookup IP 2 country.
      */
-    const GEOCODE_SERVICE_URL = 'http://ip2c.org/';
+    const GEOCODE_SERVICE_URL = 'https://api.ip2country.info/ip?';
 
     protected $soapClient;
 
@@ -425,15 +425,13 @@ class VatCalculator
         $ip = $this->getClientIP();
         $url = self::GEOCODE_SERVICE_URL.$ip;
         $result = file_get_contents($url);
-        switch ($result[0]) {
-            case '1':
-                $data = explode(';', $result);
-
-                return $data[1];
-                break;
-            default:
-                return false;
+        if ($result != false) {
+            $json = json_decode($result);
+            $countryCode = $json->countryCode;
+        } else {
+            $countryCode = false;
         }
+        return $countryCode;
     }
 
     /**
@@ -677,7 +675,7 @@ class VatCalculator
      */
     public function getVATDetails($vatNumber)
     {
-        $vatNumber = str_replace([' ', '-', '.', ','], '', trim($vatNumber));
+        $vatNumber = str_replace([' ', "\xC2\xA0", "\xA0", '-', '.', ','], '', trim($vatNumber));
         $countryCode = substr($vatNumber, 0, 2);
         $vatNumber = substr($vatNumber, 2);
         $this->initSoapClient();
