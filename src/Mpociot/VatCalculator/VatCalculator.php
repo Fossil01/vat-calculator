@@ -427,7 +427,7 @@ class VatCalculator
         $result = file_get_contents($url);
         if ($result != false) {
             $json = json_decode($result);
-            $countryCode = $json->countryCode;
+            $countryCode = $json->country_code;
         } else {
             $countryCode = false;
         }
