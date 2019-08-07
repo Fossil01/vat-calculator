@@ -17,7 +17,7 @@ class VatCalculator
     /**
      * We're using the free ip2c service to lookup IP 2 country.
      */
-    const GEOCODE_SERVICE_URL = 'https://api.ip2country.info/ip?';
+    const GEOCODE_SERVICE_URL = 'http://api.ipapi.com';
 
     protected $soapClient;
 
@@ -423,7 +423,7 @@ class VatCalculator
     public function getIPBasedCountry()
     {
         $ip = $this->getClientIP();
-        $url = self::GEOCODE_SERVICE_URL.$ip;
+        $url = sprintf("%s/%s?access_key=%s", self::GEOCODE_SERVICE_URL, $ip, env('APILAYER_KEY'));
         $result = file_get_contents($url);
         if ($result != false) {
             $json = json_decode($result);
