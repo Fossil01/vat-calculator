@@ -49,4 +49,14 @@ return [
     'business_country_code' => '',
 
     'forward_soap_faults' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | IPAPI.com Key
+    |--------------------------------------------------------------------------
+    |
+    | https://ipapi.com/product
+    |
+    */
+    'ipapi_key' => env('APILAYER_KEY', ''),
 ];

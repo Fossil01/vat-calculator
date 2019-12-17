@@ -10,8 +10,8 @@
         }
     ],
     "require": {
-      "php": ">=7.0",
-      "ext-soap": "*"
+        "php": ">=7.0",
+        "ext-soap": "*"
     },
     "require-dev": {
         "illuminate/support": "^5.0|^6.0",

@@ -15,7 +15,7 @@ class VatCalculator
     const VAT_SERVICE_URL = 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl';
 
     /**
-     * We're using the free ip2c service to lookup IP 2 country.
+     * We're using the free IPAPI service from APILayer
      */
     const GEOCODE_SERVICE_URL = 'http://api.ipapi.com';
 
@@ -390,8 +390,13 @@ class VatCalculator
         $this->config = $config;
 
         $businessCountryKey = 'vat_calculator.business_country_code';
+        $ipApiKey = 'vat_calculator.ipapi_key';
+
         if (isset($this->config) && $this->config->has($businessCountryKey)) {
             $this->setBusinessCountryCode($this->config->get($businessCountryKey, ''));
+        }
+        if (isset($this->config) && $this->config->has($ipApiKey)) {
+            $this->setAPiKey($this->config->get($ipApiKey, ''));
         }
     }
 
@@ -423,8 +428,8 @@ class VatCalculator
     public function getIPBasedCountry()
     {
         $ip = $this->getClientIP();
-        $url = sprintf("%s/%s?access_key=%s", self::GEOCODE_SERVICE_URL, $ip, env('APILAYER_KEY'));
-        $result = file_get_contents($url);
+        $url = sprintf("%s/%s?access_key=%s", self::GEOCODE_SERVICE_URL, $ip, $this->apiKey);
+        $result = @file_get_contents($url);
         if ($result != false) {
             $json = json_decode($result);
             $countryCode = $json->country_code;
@@ -581,6 +586,14 @@ class VatCalculator
     public function setBusinessCountryCode($businessCountryCode)
     {
         $this->businessCountryCode = $businessCountryCode;
+    }
+
+    /**
+     * @param string $businessCountryCode
+     */
+    public function setAPiKey($apiKey)
+    {
+        $this->apiKey = $apiKey;
     }
 
     /**
