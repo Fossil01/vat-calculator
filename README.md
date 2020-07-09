@@ -11,6 +11,8 @@ VatCalculator
 Handle all the hard stuff related to EU MOSS tax/vat regulations, the way it should be.
 Can be used with **Laravel 5 / Cashier** &mdash; or **standalone**.
 
+This fork changes the API used to get the country code for one that supports IPv6.
+
 ```php
 // Easy to use!
 $countryCode = VatCalculator::getIPBasedCountry();
