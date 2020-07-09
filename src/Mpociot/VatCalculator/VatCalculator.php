@@ -49,7 +49,15 @@ class VatCalculator
             'rate' => 0.21,
         ],
         'DE' => [ // Germany
-            'rate'       => 0.16,
+            'rate' => 0.19,
+            'since' => [
+                '2021-01-01 00:00:00 Europe/Berlin' => [
+                    'rate' => 0.19,
+                ],
+                '2020-07-01 00:00:00 Europe/Berlin' => [
+                    'rate' => 0.16,
+                ],
+            ],
             'exceptions' => [
                 'Heligoland'            => 0,
                 'Büsingen am Hochrhein' => 0,
@@ -383,11 +391,17 @@ class VatCalculator
     protected $businessCountryCode;
 
     /**
+     * @var integer
+     */
+	private $now;
+
+    /**
      * @param \Illuminate\Contracts\Config\Repository
      */
     public function __construct($config = null)
     {
         $this->config = $config;
+        $this->now = time();
 
         $businessCountryKey = 'vat_calculator.business_country_code';
         if (isset($this->config) && $this->config->has($businessCountryKey)) {
@@ -443,7 +457,7 @@ class VatCalculator
      */
     public function shouldCollectVAT($countryCode)
     {
-        $taxKey = 'vat_calculator.rules.'.strtoupper($countryCode);
+        $taxKey = 'vat_calculator.rules.' . strtoupper($countryCode);
 
         return isset($this->taxRules[strtoupper($countryCode)]) || (isset($this->config) && $this->config->has($taxKey));
     }
@@ -615,7 +629,7 @@ class VatCalculator
         if ($company && strtoupper($countryCode) !== strtoupper($this->businessCountryCode)) {
             return 0;
         }
-        $taxKey = 'vat_calculator.rules.'.strtoupper($countryCode);
+        $taxKey = 'vat_calculator.rules.' . strtoupper($countryCode);
         if (isset($this->config) && $this->config->has($taxKey)) {
             return $this->config->get($taxKey, 0);
         }
@@ -636,6 +650,14 @@ class VatCalculator
         if ($type !== null) {
             return isset($this->taxRules[strtoupper($countryCode)]['rates'][$type]) ? $this->taxRules[strtoupper($countryCode)]['rates'][$type] : 0;
         }
+
+        if (isset($this->taxRules[strtoupper($countryCode)]['since'])) {
+			foreach ($this->taxRules[strtoupper($countryCode)]['since'] as $since => $rates) {
+				if (strtotime($since) <= $this->now) {
+					return $rates['rate'];
+				}
+			}
+		}
 
         return isset($this->taxRules[strtoupper($countryCode)]['rate']) ? $this->taxRules[strtoupper($countryCode)]['rate'] : 0;
     }
